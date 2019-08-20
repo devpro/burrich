@@ -2,3 +2,5 @@
 *.DotSettings.user
 bin/
 obj/
+.DS_Store
+/report-*.txt

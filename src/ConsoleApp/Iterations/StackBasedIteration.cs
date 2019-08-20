@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Burrich.ConsoleApp.Reporters;
 using Microsoft.Extensions.Logging;
 
 namespace Burrich.ConsoleApp.Iterations
@@ -9,15 +10,19 @@ namespace Burrich.ConsoleApp.Iterations
     public class StackBasedIteration
     {
         private readonly ILogger<StackBasedIteration> _logger;
+        private readonly IReporter _reporter;
+        private readonly List<string> _excludes;
 
-        public StackBasedIteration(ILogger<StackBasedIteration> logger)
+        public StackBasedIteration(ILogger<StackBasedIteration> logger, IReporter reporter, List<string> excludes)
         {
             _logger = logger;
+            _reporter = reporter;
+            _excludes = excludes;
         }
 
-        public void TraverseTree(string root, List<string> excludes)
+        public void TraverseTree(string root)
         {
-            _logger.LogInformation($"Starting to traverse tree [RootFolder={root}] [Excludes={string.Join(";", excludes)}]");
+            _logger.LogInformation($"Starting to traverse tree [RootFolder={root}] [Excludes={string.Join(";", _excludes)}]");
 
             // Data structure to hold names of subfolders to be examined for files.
             var dirs = new Stack<string>(20);
@@ -27,16 +32,20 @@ namespace Burrich.ConsoleApp.Iterations
                 throw new ArgumentException(nameof(root));
             }
 
+            _reporter.Init();
+
             dirs.Push(root);
 
             while (dirs.Count > 0)
             {
                 var currentDir = dirs.Pop();
 
-                if (excludes.Contains(Path.GetFileName(currentDir)))
+                if (_excludes.Contains(Path.GetFileName(currentDir)))
                 {
                     continue;
                 }
+
+                _reporter.StartFolder(currentDir);
 
                 string[] subDirs;
                 try
@@ -63,6 +72,12 @@ namespace Burrich.ConsoleApp.Iterations
                     continue;
                 }
 
+                if (subDirs.Contains(Path.Combine(currentDir, ".git")))
+                {
+                    _reporter.EndFolder();
+                    continue;
+                }
+
                 string[] files = null;
                 try
                 {
@@ -85,9 +100,15 @@ namespace Burrich.ConsoleApp.Iterations
                 {
                     try
                     {
+
                         // Perform whatever action is required in your scenario.
                         var fi = new FileInfo(file);
-                        Console.WriteLine($"{fi.FullName}: {fi.Length.ToString()}, {fi.CreationTime.ToString("yyyy-MM-dd")}");
+                        if (_excludes.Contains(fi.Name))
+                        {
+                            continue;
+                        }
+
+                        _reporter.AddFile(fi);
                     }
                     catch (FileNotFoundException e)
                     {
@@ -105,6 +126,8 @@ namespace Burrich.ConsoleApp.Iterations
                 {
                     dirs.Push(str);
                 }
+
+                _reporter.EndFolder();
             }
         }
     }
