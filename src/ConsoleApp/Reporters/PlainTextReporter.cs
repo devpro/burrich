@@ -15,9 +15,12 @@ namespace Burrich.ConsoleApp.Reporters
             _stringBuffer = new StringBuilder();
         }
 
-        public void Init()
+        public void Init(string machineName)
         {
             File.Create(_outputFilepath).Dispose();
+            _stringBuffer.Clear();
+            _stringBuffer.AppendLine($"m;{machineName};;;");
+            File.AppendAllText(_outputFilepath, _stringBuffer.ToString());
         }
 
         public void StartFolder(string name)

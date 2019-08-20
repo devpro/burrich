@@ -29,10 +29,10 @@ namespace Burrich.ConsoleApp.Iterations
 
             if (!Directory.Exists(root))
             {
-                throw new ArgumentException(nameof(root));
+                throw new Exception($"Root folder {root} doesn't exist");
             }
 
-            _reporter.Init();
+            _reporter.Init(Environment.MachineName);
 
             dirs.Push(root);
 
@@ -78,7 +78,7 @@ namespace Burrich.ConsoleApp.Iterations
                     continue;
                 }
 
-                string[] files = null;
+                string[] files;
                 try
                 {
                     files = Directory.GetFiles(currentDir);
@@ -95,7 +95,6 @@ namespace Burrich.ConsoleApp.Iterations
                 }
 
                 // Perform the required action on each file here.
-                // Modify this block to perform your required task.
                 foreach (var file in files)
                 {
                     try
@@ -112,11 +111,8 @@ namespace Burrich.ConsoleApp.Iterations
                     }
                     catch (FileNotFoundException e)
                     {
-                        // If file was deleted by a separate application
-                        //  or thread since the call to TraverseTree()
-                        // then just continue.
+                        // If file was deleted by a separate application or thread since the call to TraverseTree() then just continue.
                         Console.WriteLine(e.Message);
-                        continue;
                     }
                 }
 
