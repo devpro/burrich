@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Burrich.ConsoleApp.Reporters;
@@ -45,8 +46,6 @@ namespace Burrich.ConsoleApp.Iterations
                     continue;
                 }
 
-                _reporter.StartFolder(currentDir);
-
                 string[] subDirs;
                 try
                 {
@@ -74,9 +73,22 @@ namespace Burrich.ConsoleApp.Iterations
 
                 if (subDirs.Contains(Path.Combine(currentDir, ".git")))
                 {
+                    var gitStatus = ExecuteCommandLine(currentDir, "git", "status -s");
+                    if (!string.IsNullOrEmpty(gitStatus))
+                    {
+                        _logger.LogWarning($"Directory \"{currentDir}\" has uncommitted changes");
+                        _logger.LogDebug(gitStatus);
+                    }
+                    var gitRemoteOriginUrl = ExecuteCommandLine(currentDir, "git", "remote get-url origin")
+                        .Replace("\t", "")
+                        .Replace("\n", "")
+                        .Trim();
+                    _reporter.StartFolder(currentDir, gitRemoteOriginUrl, string.IsNullOrEmpty(gitStatus));
                     _reporter.EndFolder();
                     continue;
                 }
+
+                _reporter.StartFolder(currentDir);
 
                 string[] files;
                 try
@@ -124,6 +136,22 @@ namespace Burrich.ConsoleApp.Iterations
                 }
 
                 _reporter.EndFolder();
+            }
+        }
+
+        private string ExecuteCommandLine(string workingDirectory, string executable, string arguments)
+        {
+            using (var p = new Process())
+            {
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.FileName = executable;
+                p.StartInfo.Arguments = arguments;
+                p.StartInfo.WorkingDirectory = workingDirectory;
+                p.Start();
+                var output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+                return output;
             }
         }
     }

@@ -10,9 +10,20 @@ namespace Burrich.ConsoleApp.Reporters
             Console.WriteLine($"Machine {machineName}");
         }
 
-        public void StartFolder(string name)
+        public void StartFolder(string name, string gitRemoteOriginUrl = null, bool? hasLocalChanges = null)
         {
-            Console.WriteLine($"Folder {name}");
+            if (string.IsNullOrEmpty(gitRemoteOriginUrl))
+            {
+                Console.WriteLine($"Folder {name}");
+            }
+            else if (hasLocalChanges.HasValue && hasLocalChanges.Value)
+            {
+                Console.WriteLine($"Folder {name} mapped on {gitRemoteOriginUrl} with local changes");
+            }
+            else
+            {
+                Console.WriteLine($"Folder {name} mapped on {gitRemoteOriginUrl} with no local changes");
+            }
         }
 
         public void AddFile(FileInfo fi)

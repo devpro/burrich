@@ -44,7 +44,7 @@ namespace Burrich.ConsoleApp
             switch (opts.Reporter)
             {
                 case Reporter.PlainText:
-                    reporter = new PlainTextReporter(opts.Output ?? Path.Combine(Directory.GetCurrentDirectory(), $"report-{DateTime.Now.ToString("yyyyMMddHHmmss")}.txt"));
+                    reporter = new PlainTextReporter(opts.Output ?? Path.Combine(Directory.GetCurrentDirectory(), $"report-{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv"));
                     break;
                 default:
                     reporter = new ConsoleReporter();

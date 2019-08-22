@@ -19,19 +19,20 @@ namespace Burrich.ConsoleApp.Reporters
         {
             File.Create(_outputFilepath).Dispose();
             _stringBuffer.Clear();
-            _stringBuffer.AppendLine($"m;{machineName};;;");
+            _stringBuffer.AppendLine($"TYPE;NAME;LENGTH;CREATEDAT;GITREMOTEURL;HASLOCALCHANGES;");
+            _stringBuffer.AppendLine($"m;{machineName};;;;;");
             File.AppendAllText(_outputFilepath, _stringBuffer.ToString());
         }
 
-        public void StartFolder(string name)
+        public void StartFolder(string name, string gitRemoteOriginUrl = null, bool? hasLocalChanges = null)
         {
             _stringBuffer.Clear();
-            _stringBuffer.AppendLine($"f;{name};;;");
+            _stringBuffer.AppendLine($"f;{name};;;{gitRemoteOriginUrl ?? ""};{(hasLocalChanges.HasValue ? hasLocalChanges.Value.ToString() : "")};");
         }
 
         public void AddFile(FileInfo fi)
         {
-            _stringBuffer.AppendLine($"d;{fi.FullName};{fi.Length.ToString()};{fi.CreationTime.ToString("yyyy-MM-dd")};");
+            _stringBuffer.AppendLine($"d;{fi.FullName};{fi.Length.ToString()};{fi.CreationTime.ToString("yyyy-MM-dd")};;;");
         }
 
         public void EndFolder()
