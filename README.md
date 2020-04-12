@@ -1,6 +1,9 @@
 # Burrich
 
 [![Build Status](https://dev.azure.com/devprofr/open-source/_apis/build/status/global-tools/burrich-ci?branchName=master)](https://dev.azure.com/devprofr/open-source/_build/latest?definitionId=39&branchName=master)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=devpro.burrich&metric=alert_status)](https://sonarcloud.io/dashboard?id=devpro.burrich)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=devpro.burrich&metric=coverage)](https://sonarcloud.io/dashboard?id=devpro.burrich)
+[![Nuget](https://img.shields.io/nuget/v/burrich.svg)](https://www.nuget.org/packages/burrich)
 
 Burrich is a command line tool, written in .NET Core 3.1 / [C# 8.0](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8), that will look at a directory and gather information on files and directories.
 

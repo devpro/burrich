@@ -11,7 +11,9 @@ namespace Burrich.ConsoleApp.Iterations
     public class StackBasedIteration
     {
         private readonly ILogger<StackBasedIteration> _logger;
+
         private readonly IReporter _reporter;
+
         private readonly List<string> _excludes;
 
         public StackBasedIteration(ILogger<StackBasedIteration> logger, IReporter reporter, List<string> excludes)
@@ -46,66 +48,7 @@ namespace Burrich.ConsoleApp.Iterations
                     continue;
                 }
 
-                if (!GetDirectories(currentDir, out var subDirs))
-                {
-                    continue;
-                }
-
-                // check git repository
-                if (subDirs.Contains(Path.Combine(currentDir, ".git")))
-                {
-                    var gitStatus = ExecuteCommandLine(currentDir, "git", "status -s");
-                    if (!string.IsNullOrEmpty(gitStatus))
-                    {
-                        _logger.LogWarning($"Directory \"{currentDir}\" has uncommitted changes");
-                        _logger.LogDebug(gitStatus);
-                    }
-                    var gitRemoteOriginUrl = ExecuteCommandLine(currentDir, "git", "remote get-url origin")
-                        .Replace("\t", "")
-                        .Replace("\n", "")
-                        .Trim();
-                    _reporter.StartFolder(currentDir, gitRemoteOriginUrl, string.IsNullOrEmpty(gitStatus));
-                    _reporter.EndFolder();
-                    continue;
-                }
-
-                _reporter.StartFolder(currentDir);
-
-                if (!GetFiles(currentDir, out var files))
-                {
-                    continue;
-                }
-
-                // Perform the required action on each file here.
-                foreach (var file in files)
-                {
-                    try
-                    {
-
-                        // Perform whatever action is required in your scenario.
-                        var fi = new FileInfo(file);
-                        if (_excludes.Contains(fi.Name))
-                        {
-                            continue;
-                        }
-
-                        _reporter.AddFile(fi);
-                    }
-                    catch (FileNotFoundException e)
-                    {
-                        // If file was deleted by a separate application or thread since the call to TraverseTree() then just continue.
-                        Console.WriteLine(e.Message);
-                    }
-                }
-
-                // Push the subdirectories onto the stack for traversal.
-                // This could also be done before handing the files.
-                foreach (var str in subDirs)
-                {
-                    dirs.Push(str);
-                }
-
-                _reporter.EndFolder();
+                ProcessDirectories(currentDir, ref dirs);
             }
         }
 
@@ -161,6 +104,72 @@ namespace Burrich.ConsoleApp.Iterations
 
             files = null;
             return false;
+        }
+
+        private void ProcessDirectories(string currentDir, ref Stack<string> dirs)
+        {
+            if (!GetDirectories(currentDir, out var subDirs))
+            {
+                return;
+            }
+
+            // check git repository
+            if (subDirs.Contains(Path.Combine(currentDir, ".git")))
+            {
+                var gitStatus = ExecuteCommandLine(currentDir, "git", "status -s");
+                if (!string.IsNullOrEmpty(gitStatus))
+                {
+                    _logger.LogWarning($"Directory \"{currentDir}\" has uncommitted changes");
+                    _logger.LogDebug(gitStatus);
+                }
+                var gitRemoteOriginUrl = ExecuteCommandLine(currentDir, "git", "remote get-url origin")
+                    .Replace("\t", "")
+                    .Replace("\n", "")
+                    .Trim();
+                _reporter.StartFolder(currentDir, gitRemoteOriginUrl, !string.IsNullOrEmpty(gitStatus));
+                _reporter.EndFolder();
+                return;
+            }
+
+            foreach (var str in subDirs)
+            {
+                dirs.Push(str);
+            }
+
+            _reporter.StartFolder(currentDir);
+
+            ProcessFiles(currentDir);
+
+            _reporter.EndFolder();
+        }
+
+        private void ProcessFiles(string currentDir)
+        {
+            if (!GetFiles(currentDir, out var files))
+            {
+                return;
+            }
+
+            // performs the required action on each file
+            FileInfo fileInfo;
+            foreach (var file in files)
+            {
+                try
+                {
+                    fileInfo = new FileInfo(file);
+                    if (_excludes.Contains(fileInfo.Name))
+                    {
+                        continue;
+                    }
+
+                    _reporter.AddFile(fileInfo);
+                }
+                catch (FileNotFoundException e)
+                {
+                    // if the file was deleted by a separate application or thread since the call to TraverseTree() then just continue.
+                    Console.WriteLine(e.Message);
+                }
+            }
         }
     }
 }

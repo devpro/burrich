@@ -14,21 +14,21 @@ namespace Burrich.ConsoleApp.Reporters
         {
             if (string.IsNullOrEmpty(gitRemoteOriginUrl))
             {
-                Console.WriteLine($"Folder {name}");
+                Console.WriteLine($"{name}");
             }
             else if (hasLocalChanges.HasValue && hasLocalChanges.Value)
             {
-                Console.WriteLine($"Folder {name} mapped on {gitRemoteOriginUrl} with local changes");
+                Console.WriteLine($"{name} -> git {gitRemoteOriginUrl} with local changes");
             }
             else
             {
-                Console.WriteLine($"Folder {name} mapped on {gitRemoteOriginUrl} with no local changes");
+                Console.WriteLine($"{name} -> git {gitRemoteOriginUrl}");
             }
         }
 
         public void AddFile(FileInfo fi)
         {
-            Console.WriteLine($"{fi.FullName}: {fi.Length}, {fi.CreationTime:yyyy-MM-dd}");
+            Console.WriteLine($"- {fi.FullName}: {fi.Length}, {fi.CreationTime:yyyy-MM-dd}");
         }
 
         public void EndFolder()
