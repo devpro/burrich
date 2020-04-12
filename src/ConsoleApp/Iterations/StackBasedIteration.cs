@@ -23,17 +23,17 @@ namespace Burrich.ConsoleApp.Iterations
 
         public void TraverseTree(string root)
         {
-            _logger.LogInformation($"Starting to traverse tree [RootFolder={root}] [Excludes={string.Join(";", _excludes)}]");
-
-            // Data structure to hold names of subfolders to be examined for files.
-            var dirs = new Stack<string>(20);
-
-            if (!Directory.Exists(root))
+            if (string.IsNullOrEmpty(root) || !Directory.Exists(root))
             {
-                throw new Exception($"Root folder {root} doesn't exist");
+                throw new ArgumentException($"Root folder \"{root}\" doesn't exist", nameof(root));
             }
 
+            _logger.LogInformation($"Starting to traverse tree [RootFolder={root}] [Excludes={string.Join(";", _excludes)}]");
+
             _reporter.Init(Environment.MachineName);
+
+            // will hold names of subfolders to be examined for files
+            var dirs = new Stack<string>(20);
 
             dirs.Push(root);
 
@@ -46,31 +46,12 @@ namespace Burrich.ConsoleApp.Iterations
                     continue;
                 }
 
-                string[] subDirs;
-                try
+                if (!GetDirectories(currentDir, out var subDirs))
                 {
-                    subDirs = Directory.GetDirectories(currentDir);
-                }
-                // An UnauthorizedAccessException exception will be thrown if we do not have
-                // discovery permission on a folder or file. It may or may not be acceptable
-                // to ignore the exception and continue enumerating the remaining files and
-                // folders. It is also possible (but unlikely) that a DirectoryNotFound exception
-                // will be raised. This will happen if currentDir has been deleted by
-                // another application or thread after our call to Directory.Exists. The
-                // choice of which exceptions to catch depends entirely on the specific task
-                // you are intending to perform and also on how much you know with certainty
-                // about the systems on which this code will run.
-                catch (UnauthorizedAccessException e)
-                {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
-                catch (DirectoryNotFoundException e)
-                {
-                    Console.WriteLine(e.Message);
                     continue;
                 }
 
+                // check git repository
                 if (subDirs.Contains(Path.Combine(currentDir, ".git")))
                 {
                     var gitStatus = ExecuteCommandLine(currentDir, "git", "status -s");
@@ -90,19 +71,8 @@ namespace Burrich.ConsoleApp.Iterations
 
                 _reporter.StartFolder(currentDir);
 
-                string[] files;
-                try
+                if (!GetFiles(currentDir, out var files))
                 {
-                    files = Directory.GetFiles(currentDir);
-                }
-                catch (UnauthorizedAccessException e)
-                {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
-                catch (DirectoryNotFoundException e)
-                {
-                    Console.WriteLine(e.Message);
                     continue;
                 }
 
@@ -151,6 +121,46 @@ namespace Burrich.ConsoleApp.Iterations
             var output = p.StandardOutput.ReadToEnd();
             p.WaitForExit();
             return output;
+        }
+
+        private bool GetDirectories(string currentDir, out string[] subDirs)
+        {
+            try
+            {
+                subDirs = Directory.GetDirectories(currentDir);
+                return true;
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            subDirs = null;
+            return false;
+        }
+
+        private bool GetFiles(string currentDir, out string[] files)
+        {
+            try
+            {
+                files = Directory.GetFiles(currentDir);
+                return true;
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            files = null;
+            return false;
         }
     }
 }

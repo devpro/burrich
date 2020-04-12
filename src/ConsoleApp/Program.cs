@@ -22,7 +22,7 @@ namespace Burrich.ConsoleApp
                 .WithNotParsed(errs => HandleParseError(errs));
         }
 
-        private static int RunOptionsAndReturnExitCode(CommandLineOptions opts)
+        private static void RunOptionsAndReturnExitCode(CommandLineOptions opts)
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location))
@@ -46,13 +46,11 @@ namespace Burrich.ConsoleApp
             var iteration = new StackBasedIteration(serviceProvider.GetService<ILogger<StackBasedIteration>>(), reporter,
                 configuration.GetSection("Parsing:Excludes").Get<List<string>>());
             opts.Directories.ToList().ForEach(x => iteration.TraverseTree(x));
-            return 0;
         }
 
-        private static int HandleParseError(IEnumerable<Error> errors)
+        private static void HandleParseError(IEnumerable<Error> errors)
         {
             errors.ToList().ForEach(Console.WriteLine);
-            return -2;
         }
     }
 }

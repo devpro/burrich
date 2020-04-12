@@ -33,6 +33,7 @@ namespace Burrich.ConsoleApp.Reporters
 
         public void EndFolder()
         {
+            // nothing to do here
         }
     }
 }

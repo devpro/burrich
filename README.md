@@ -1,10 +1,12 @@
 # Burrich
 
-This is the codebase of Burrich, a command line tool, written in .NET Core 2.2, that will look at a directory and gather intel on files and directories.
+[![Build Status](https://dev.azure.com/devprofr/open-source/_apis/build/status/global-tools/burrich-ci?branchName=master)](https://dev.azure.com/devprofr/open-source/_build/latest?definitionId=39&branchName=master)
+
+Burrich is a command line tool, written in .NET Core 3.1 / [C# 8.0](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8), that will look at a directory and gather information on files and directories.
 
 > I forgot what was on this external hard drive... And what happens if it gets lost?
 
-Burrich solution has been made to tackle such topics and help organize our digital elements, that can be quickly be a mess!
+Burrich solution has been made to tackle such topics and help organize our digital material, that can be quickly be a mess!
 
 ## Build & Run
 
