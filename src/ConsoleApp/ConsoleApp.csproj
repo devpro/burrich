@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Burrich.ConsoleApp</AssemblyName>
     <RootNamespace>Burrich.ConsoleApp</RootNamespace>
   </PropertyGroup>

@@ -141,18 +141,16 @@ namespace Burrich.ConsoleApp.Iterations
 
         private string ExecuteCommandLine(string workingDirectory, string executable, string arguments)
         {
-            using (var p = new Process())
-            {
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.FileName = executable;
-                p.StartInfo.Arguments = arguments;
-                p.StartInfo.WorkingDirectory = workingDirectory;
-                p.Start();
-                var output = p.StandardOutput.ReadToEnd();
-                p.WaitForExit();
-                return output;
-            }
+            using var p = new Process();
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.FileName = executable;
+            p.StartInfo.Arguments = arguments;
+            p.StartInfo.WorkingDirectory = workingDirectory;
+            p.Start();
+            var output = p.StandardOutput.ReadToEnd();
+            p.WaitForExit();
+            return output;
         }
     }
 }

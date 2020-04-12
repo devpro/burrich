@@ -32,7 +32,7 @@ namespace Burrich.ConsoleApp.Reporters
 
         public void AddFile(FileInfo fi)
         {
-            _stringBuffer.AppendLine($"d;{fi.FullName};{fi.Length.ToString()};{fi.CreationTime.ToString("yyyy-MM-dd")};;;");
+            _stringBuffer.AppendLine($"d;{fi.FullName};{fi.Length};{fi.CreationTime:yyyy-MM-dd};;;");
         }
 
         public void EndFolder()

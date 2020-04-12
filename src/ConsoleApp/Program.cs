@@ -29,7 +29,6 @@ namespace Burrich.ConsoleApp
                 .AddJsonFile($"appsettings.json", true, true)
                 .AddEnvironmentVariables()
                 .Build();
-            // Console.WriteLine(configuration["Logging:LogLevel:Default"]);
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLogging(builder =>
@@ -39,18 +38,11 @@ namespace Burrich.ConsoleApp
                         .AddConsole();
                 });
             var serviceProvider = serviceCollection.BuildServiceProvider();
-
-            IReporter reporter;
-            switch (opts.Reporter)
+            IReporter reporter = opts.Reporter switch
             {
-                case Reporter.PlainText:
-                    reporter = new PlainTextReporter(opts.Output ?? Path.Combine(Directory.GetCurrentDirectory(), $"report-{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv"));
-                    break;
-                default:
-                    reporter = new ConsoleReporter();
-                    break;
-            }
-
+                Reporter.PlainText => new PlainTextReporter(opts.Output ?? Path.Combine(Directory.GetCurrentDirectory(), $"report-{DateTime.Now:yyyyMMddHHmmss}.csv")),
+                _ => new ConsoleReporter()
+            };
             var iteration = new StackBasedIteration(serviceProvider.GetService<ILogger<StackBasedIteration>>(), reporter,
                 configuration.GetSection("Parsing:Excludes").Get<List<string>>());
             opts.Directories.ToList().ForEach(x => iteration.TraverseTree(x));
