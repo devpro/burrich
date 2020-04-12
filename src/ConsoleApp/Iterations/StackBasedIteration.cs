@@ -154,6 +154,11 @@ namespace Burrich.ConsoleApp.Iterations
             FileInfo fileInfo;
             foreach (var file in files)
             {
+                if (_excludes.Contains(file, StringComparer.InvariantCultureIgnoreCase))
+                {
+                    continue;
+                }
+
                 try
                 {
                     fileInfo = new FileInfo(file);
