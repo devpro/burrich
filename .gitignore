@@ -4,3 +4,5 @@ bin/
 obj/
 .DS_Store
 /report-*.txt
+.vs/
+launchSettings.json

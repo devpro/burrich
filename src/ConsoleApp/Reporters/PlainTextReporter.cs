@@ -30,9 +30,9 @@ namespace Burrich.ConsoleApp.Reporters
             _stringBuffer.AppendLine($"f;{name};;;{gitRemoteOriginUrl ?? ""};{(hasLocalChanges.HasValue ? hasLocalChanges.Value.ToString() : "")};");
         }
 
-        public void AddFile(FileInfo fi)
+        public void AddFile(FileInfo fileInfo)
         {
-            _stringBuffer.AppendLine($"d;{fi.FullName};{fi.Length.ToString()};{fi.CreationTime.ToString("yyyy-MM-dd")};;;");
+            _stringBuffer.AppendLine($"d;{fileInfo.FullName};{fileInfo.Length};{fileInfo.CreationTime:yyyy-MM-dd};;;");
         }
 
         public void EndFolder()
