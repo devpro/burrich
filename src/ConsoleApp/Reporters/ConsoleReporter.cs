@@ -28,7 +28,7 @@ namespace Burrich.ConsoleApp.Reporters
 
         public void AddFile(FileInfo fi)
         {
-            Console.WriteLine($"{fi.FullName}: {fi.Length.ToString()}, {fi.CreationTime.ToString("yyyy-MM-dd")}");
+            Console.WriteLine($"{fi.FullName}: {fi.Length}, {fi.CreationTime:yyyy-MM-dd}");
         }
 
         public void EndFolder()
